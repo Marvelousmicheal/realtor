@@ -1,10 +1,25 @@
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ForgottenPassword from "./pages/ForgottenPassword";
+import Home from "./pages/Home";
+import Offer from "./pages/Offer";
+import Profile from "./pages/Profile";
+import SignIn from "./pages/SignIn";
+import SIgnUp from "./pages/SIgnUp";
 
 function App() {
   return (
     <div className="App">
       <>
-        <h1 className="text-2xl bg-red-500">hello world</h1>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/ForgottenPassword" element={<ForgottenPassword/>} />
+            <Route path="/Offer" element={<Offer />} />
+            <Route path="/Profile" element={<Profile />} />
+            <Route path="/Sign-Up" element={<SIgnUp />} />
+            <Route path="/Sign-In" element={<SignIn />} />
+          </Routes>
+        </Router>
       </>
     </div>
   );
