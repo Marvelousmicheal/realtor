@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background-color: #fff3f3;
+}
+.debugger{
+    border: solid black 1px;
+}
