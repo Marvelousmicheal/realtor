@@ -3,18 +3,29 @@ import signInimage from "../images/placeholder-signin.jpg";
 import { BsFillEyeFill, BsFillEyeSlashFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import GAuth from "../components/GAuth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { db } from "../firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import {toast} from "react-toastify"
 
 function SIgnUp() {
   //========= HOOK ONE ==============//
   //=========================================================================//
   // this is a hook for holding the state of the form and storing it
   const [formData, setformData] = useState({
-    Username: "",
+    username: "",
     email: "",
     password: "",
   });
+  //initialize the navigate hook
+  const navigate = useNavigate();
   // this is the destructing of the formdata
-  const { email, password, Username } = formData;
+  const { email, password, username } = formData;
   // this is a function that handles the change in the state and update it respectfully
   function onChange(e) {
     setformData((prevstate) => ({
@@ -33,6 +44,45 @@ function SIgnUp() {
   function showOrhide() {
     setShowPassword((prevstate) => !prevstate);
   }
+  //============================a=================
+
+  //=========== HandleSubmit ==============//
+  async function handleSubmit(e) {
+    e.preventDefault();
+    //this is the whole code for setting the auth and storing it in the database
+    // so we first created a variable that store the create user method, this method takes in auth, email and password
+    //so the createuser method doesnt collect username so do that we used the updateprofile method and we update the profile that was created
+
+    try {
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      //here was where we used the update method to update the profile and add a username to it
+      updateProfile(auth.currentUser, {
+        displayName: username,
+      });
+      // the variable is used to access the user profile in the database
+      const user = userCredential.user;
+      //in order to make the password more secured
+      //we created a new variable that store all the data in the formdata in a local way
+      const formDataCopy = { ...formData };
+      // we then delete the password
+      delete formDataCopy.password;
+      // to create a time stamp
+      formDataCopy.timestamp = serverTimestamp();
+
+      // this used to set the database
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+toast.success("Sign-up was successfull")
+      //after the whole thing has been done and dusted we simply navigate the user to the home page
+      navigate("/");
+    } catch (error) {
+      toast.error("Something went Wrong")
+    }
+  }
   return (
     <>
       <section>
@@ -48,22 +98,25 @@ function SIgnUp() {
             />
           </div>
           <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20 ">
-            <form action="">
-              <input
-                type="text"
-                id="name"
-                className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out mb-6 capitalize"
-                value={Username}
-                onChange={onChange}
-                placeholder="Full name"
-              />
+            <form onSubmit={handleSubmit}>
+              {
+                <input
+                  type="text"
+                  id="username"
+                  className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out mb-6 "
+                  value={username}
+                  onChange={onChange}
+                  placeholder="Enter Full-name"
+                />
+              }
+
               <input
                 type="email"
                 id="email"
-                className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out mb-6 capitalize"
+                className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out mb-6"
                 value={email}
                 onChange={onChange}
-                placeholder="email address"
+                placeholder="Enter Email-address"
               />
 
               <div className="relative mb-6">
