@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import signInimage from "../images/placeholder-signin.jpg";
 import { BsFillEyeFill, BsFillEyeSlashFill } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GAuth from "../components/GAuth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { toast } from "react-toastify";
 
 function SignIn() {
+ const navigate = useNavigate();
   //========= HOOK ONE ==============//
   //=========================================================================//
   // this is a hook for holding the state of the form and storing it
@@ -32,6 +35,30 @@ function SignIn() {
   function showOrhide() {
     setShowPassword((prevstate) => !prevstate);
   }
+  ///this is the function onsubmit
+  async function onsubmit(e) {
+    //this is avoid the default refresh 
+    e.preventDefault();
+//this is a try and catch statement that does the following
+    try {
+      //this calls the getAuth method from firebase
+      const auth = getAuth();
+      //this calls the sign in with email and password method from firebase,
+      //the result is then gotten as a promise and is saved in the usercrendiential 
+      // this also takes in auth, email, password
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      //this is used to check if the user is stored in the db and if so then navigate to the home page
+      if (userCredential.user) {
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error("Bad User Credentials");
+    }
+  }
   return (
     <>
       <section>
@@ -47,7 +74,7 @@ function SignIn() {
             />
           </div>
           <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20 ">
-            <form action="">
+            <form onSubmit={onsubmit}>
               <input
                 type="email"
                 id="email"

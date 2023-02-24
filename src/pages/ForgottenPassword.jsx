@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import signInimage from "../images/placeholder-signin.jpg";
 import { Link } from "react-router-dom";
 import GAuth from "../components/GAuth";
-
+import { toast } from "react-toastify";
+import {
+  getAuth,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 function ForgottenPassword() {
   //========= HOOK ONE ==============//
   //=========================================================================//
@@ -21,7 +26,16 @@ function ForgottenPassword() {
     }));
   }
   //=========================================================================//
-
+  async function ForgotPassword(e) {
+    e.preventdefault();
+    try {
+      const auth = getAuth();
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Email was sent");
+    } catch (error) {
+      toast.error("could not send reset password");
+    }
+  }
   return (
     <>
       <section>
@@ -37,7 +51,7 @@ function ForgottenPassword() {
             />
           </div>
           <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20 ">
-            <form action="">
+            <form onSubmit={ForgotPassword}>
               <input
                 type="email"
                 id="email"
