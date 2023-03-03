@@ -38,7 +38,7 @@ function Profile() {
           displayName: username,
         });
         //update the display name in the firebase database
-        const docRef = doc(db, "user", auth.currentUser.uid);
+        const docRef = doc(db, "users", auth.currentUser.uid);
         await updateDoc(docRef, {
           username,
         });

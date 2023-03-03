@@ -1,9 +1,20 @@
-import React from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../images/logo-logees.png";
 
-
 function Header() {
+  //=======this is firebase auth======//
+  const auth = getAuth();
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setpState("Profile");
+      } else {
+        setpState("Sign-in");
+      }
+    });
+  });
   // this is the location of the pages within the website
   const Location = useLocation();
 
@@ -11,11 +22,13 @@ function Header() {
   const navigate = useNavigate();
   // this is a function to handle the matching of the nav-links to their exact route
   //this function takes in the route as a parameter and compares it to the location.pathname and if the are the same, it then returns true
-  function PathMathRoute(route) {
+  function PathMatchRoute(route) {
     if (route === Location.pathname) {
       return true;
     }
   }
+  //======================//
+  const [pState, setpState] = useState("Sign-in");
   return (
     <>
       <div className="bg-white border-b shadow-sm sticky top-0 z-50">
@@ -32,7 +45,7 @@ function Header() {
             <ul className="flex space-x-10">
               <li
                 className={`py-3 text-sm font-semibold text-gray-400 border-b-4 border-b-transparent cursor-pointer ${
-                  PathMathRoute("/") && "text-black border-b-red-500"
+                  PathMatchRoute("/") && "text-black border-b-red-500"
                 }`}
                 onClick={() => navigate("/")}
               >
@@ -40,7 +53,7 @@ function Header() {
               </li>
               <li
                 className={`py-3 text-sm font-semibold text-gray-400 border-b-4 border-b-transparent cursor-pointer ${
-                  PathMathRoute("/offer") && "text-black border-b-red-500"
+                  PathMatchRoute("/offer") && "text-black border-b-red-500"
                 }`}
                 onClick={() => navigate("/offer")}
               >
@@ -48,11 +61,12 @@ function Header() {
               </li>
               <li
                 className={`py-3 text-sm font-semibold text-gray-400 border-b-4 border-b-transparent  cursor-pointer ${
-                  PathMathRoute("/sign-In") && "text-black border-b-red-500"
+                  PathMatchRoute("/sign-In") ||
+                  (PathMatchRoute("/profile") && "text-black border-b-red-500")
                 }`}
-                onClick={() => navigate("/sign-In")}
+                onClick={() => navigate("/profile")}
               >
-                Sign-In
+                {pState}
               </li>
             </ul>
           </div>
